@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
+#define max 200
 void drown(int num)
 {
-        char str[100];
+        char str[max];
         FILE *input;
         if(num==0)
             input=fopen("drown S0.txt","r");
@@ -18,7 +19,7 @@ void drown(int num)
             input=fopen("drown S5.txt","r");
         while(1)
         {
-            if(fgets(str,100,input)==0)
+            if(fgets(str,max,input)==0)
                 break;
             printf("%s",str);
         }
