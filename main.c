@@ -5,6 +5,7 @@
 #include <math.h>
 #include <string.h>
 #include <time.h>
+#include<windows.h>
 #include "drown.h"
 #include "linklist.h"
 #define max_n 50
@@ -90,7 +91,75 @@ struct person
     char name[max_n];
     int score;
 };
-int rand_select()
+int check_word(char word[],char alp)
+{
+    int i;
+    for(i=0;i<strlen(word);i++)
+        if(word[i]==alp)
+            return 0;
+    return -1;
+}
+float SCORE=0;
+int game_logic(char word[max_n])
+{
+    if(word==NULL)
+        return -1;
+    fflush(stdin);
+    system("cls");
+    int i;
+    drown(0);
+    printf("\nNow Guess the word!\n");
+    //printf("\n%s\n",word);    //Active this for testing
+    char guess_word[strlen(word)];
+    for(i=0;i<strlen(word);i++)
+            guess_word[i]='_';
+    for(i=0;i<strlen(word);i++)
+        printf("%c ",guess_word[i]);
+    char alp[26]={'\0'};
+    i=0;
+    int cnt=0,j=0,k=0;
+    while(j<5)
+    {
+        printf("\n");
+        scanf("%c",&alp[cnt]);
+        fflush(stdin);
+        if(alp[cnt]=='Q')
+            return -1;
+        for(i=0;i<strlen(word);i++)
+            for(k=0;k<26;k++)
+                if(word[i]==alp[k])
+                    guess_word[i]=alp[k];
+        system("cls");
+        drown(j);
+        printf("\n");
+        if(check_word(word,alp[cnt])==-1)
+        {
+            j++;
+            system("cls");
+            drown(j);
+            printf("\nWrong choice;you have %d choices left\n",5-j);
+            if(j==4)
+                printf("Be carefull!This your last choice!\n");
+        }
+        for(i=0;i<strlen(word);i++){
+            printf("%c ",guess_word[i]);
+        }
+        if(check_word(guess_word,'_')==-1)
+            break;
+        cnt++;
+    }
+    if(j==5)
+    {
+        printf("You lost this one, next word will be loaded soon\n");
+        Sleep(2000);
+        return 0;
+    }
+    else
+    {
+        return 3*strlen(word)-j;
+    }
+}
+void rand_select()
 {
     FILE * input=fopen(topic,"r");
     struct node *list=NULL;
@@ -112,26 +181,45 @@ int rand_select()
     int random;
     srand(time(NULL));
     current=list;
-    printList(current);
-    int i;
+ //   printList(current);
+    int i,tmp=0,score=0;
+    fclose(input);
+    time_t t1=time(NULL);
+    printf("%s\n\n\n\n",word);
     while(size!=0)
     {
+        tmp=0;
         printf("\n\n");
         random=(rand()%size)+1;
-        if(random==1)
-            list=deleteFront(list);//game logic over here
-        else if(random==size)
-            deletEnd(list);//game logic over here
+        if(random==1){
+            list=deleteFront(list);
+            if((tmp=game_logic(list->data))==-1)
+                exit(-1);//Exit function over here
+            score+=tmp;
+        }
+        else if(random==size){
+            deletEnd(list);
+            while(current->next!=NULL)
+                current=current->next;
+            if((tmp=current->data)==-1)
+                exit(-1);//Exit function over here
+                score+=tmp;
+            }
         else
         {
             for(i=1;i<random-1;i++)
-                current=current->next;//game logic over here
+                current=current->next;
+            if((tmp=game_logic(current->next->data))==-1)
+                exit(-1);//Exit function over here
+                score+=tmp;
             deleteNode(current);
         }
-        printList(list);
+//        printList(list);
         size--;
         current=list;
     }
+    time_t t2=time(NULL);
+    SCORE=score/((t2-t1)%60);
 }
 int main()
 {
@@ -185,6 +273,7 @@ int main()
                     if(topic_read()==-1);
                         //Exit function will be here
                     rand_select();
+                    printf("%f",SCORE);
                 }
                 else
                     if(topic_generator()==-1)
