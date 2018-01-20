@@ -7,11 +7,12 @@
 	<stdio.h>
 	<stdlib.h>
 
-1516382920 source:c:\users\mcham\desktop\hangman\main.c
+1516442190 source:c:\users\mcham\desktop\hangman\main.c
 	<stdio.h>
 	<stdlib.h>
 	<math.h>
 	<string.h>
+	<time.h>
 	"drown.h"
 	"linklist.h"
 
