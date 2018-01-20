@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include "drown.h"
+#include "linklist.h"
 //This string keeps the chosen Topics name and address
 char topic[100]="Topics\\";
 //This function will read the available topics.txt inside Topics folder print them and ask user to choose a topic then completes the topic address
@@ -33,9 +35,12 @@ int topic_read()
         printf("Incorrect character:)please choose another character:");
         scanf("%c",&num);
     }
-    for(j=0;j<(num-97)-1;j++)
+    for(j=0;j<(num-97);j++)
         fgets(str[j],50,input);
     strcat(topic,str[j]);
+    for(j=0;j<50;j++)
+        if(topic[j]=='\n')
+            topic[j]='\0';
     fclose(input);
     return 0;
 }
@@ -78,7 +83,19 @@ int topic_generator()
 }
 int main()
 {
-//    topic_read();
-//    printf("%s",topic);
+   // topic_generator();
+    topic_read();
+    printf("%s",topic);
+ //   struct node *list=createNode("Shit");
+    FILE *in=fopen(topic,"r");
+//  printList(list);
+    char c;
+    while(1)
+    {
+        if((c=getc(in))<1)
+            break;
+        printf("%c",c);
+    }
+   // drown(1);
     return 0;
 }
