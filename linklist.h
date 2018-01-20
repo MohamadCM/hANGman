@@ -10,4 +10,5 @@ struct node* deleteFront(struct node* oldList);
 void deleteNode(struct node * before);
 void printList(struct node *list);
 void deleteNode(struct node * before);
+void deletEnd(struct node* list);
 #endif // LINKLIST_H_INCLUDED

@@ -90,7 +90,49 @@ struct person
     char name[max_n];
     int score;
 };
-
+int rand_select()
+{
+    FILE * input=fopen(topic,"r");
+    struct node *list=NULL;
+    int size=1;
+    char word[max_n];
+    fscanf(input,"%s",word);
+    struct node* current=NULL;
+    list=createNode(word);
+    current=list;
+    while(1)
+    {
+        fscanf(input,"%s",word);
+        if(feof(input))
+            break;
+        current->next=createNode(word);
+        current=current->next;
+        size++;
+    }
+    int random;
+    srand(time(NULL));
+    current=list;
+    printList(current);
+    int i;
+    while(size!=0)
+    {
+        printf("\n\n");
+        random=(rand()%size)+1;
+        if(random==1)
+            list=deleteFront(list);//game logic over here
+        else if(random==size)
+            deletEnd(list);//game logic over here
+        else
+        {
+            for(i=1;i<random-1;i++)
+                current=current->next;//game logic over here
+            deleteNode(current);
+        }
+        printList(list);
+        size--;
+        current=list;
+    }
+}
 int main()
 {
 
@@ -138,9 +180,12 @@ int main()
             case('a'):
                 printf("Which one do you want?\n1-Choose one from available topics!\n2-Make a new topic!\n");
                 scanf("%d",&c);
-                if(c==1)
-                    if(topic_read()==-1)
+                fflush(stdin);
+                if(c==1){
+                    if(topic_read()==-1);
                         //Exit function will be here
+                    rand_select();
+                }
                 else
                     if(topic_generator()==-1)
                         //Exit function will be here
@@ -152,6 +197,7 @@ int main()
             case('c'):
                 printf("Which one do you want?\n1-Choose one from available topics!\n2-Make a new topic\n");
                 scanf("%d",&c);
+                fflush(stdin);
                 if(c==1)
                     topic_read();
                 else
