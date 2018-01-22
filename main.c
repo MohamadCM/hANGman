@@ -48,7 +48,7 @@ int topic_select()
         if(topic[j]=='\n')
             topic[j]='\0';
     fclose(input);
-    return 97-(int)c;
+    return 97-((int)num);
 }
 //This function creates a new topic and fill it with user's chosen names
 int topic_generator()
@@ -91,6 +91,7 @@ struct person
 {
     char name[max_n];
     float score[max_number_of_topics];
+    float scoreSum;
 };
 int check_word(char word[],char alp)
 {
@@ -225,8 +226,9 @@ float rand_select()
 }
 void EXIT(struct person p)
 {
-    printf("You choose to exit the game\ndo you want save your stats?\na-yes:))\nb-no:((");
+    printf("You choose to exit the game\ndo you want save your stats?\na-yes:))\nb-no:((\n");
     char check;
+    fflush(stdin);
     scanf("%c",&check);
     if(check=='b')
     {
@@ -248,8 +250,38 @@ void EXIT(struct person p)
         }
     }
     fwrite(&p,sizeof(struct person),1,personHolder);
+    printf("Saved....We wait for your return:))");
     fclose(personHolder);
     exit(1);
+}
+void highScoreShow()
+{
+    FILE *personHolder=fopen("Persons.bin","rb");
+    int i=1;
+    struct person* p;
+    p=(struct person*) malloc(sizeof(struct person));//used to create an array of users
+    while(1)
+    {
+        if(fread(&p[i-1],sizeof(struct person),1,personHolder)<1)
+            break;
+        i++;
+        p=(struct person*)realloc(p,sizeof(struct person)*i);
+    }
+    int size=i,j=0;//Sort
+    for(i=0;i<size;i++)
+        for(j=0;j<size-1;j++)
+            if(p[j].scoreSum<p[j+1].scoreSum)
+            {
+                struct person tmp;
+                tmp=p[j+1];
+                p[j+1]=p[j];
+                p[j]=tmp;
+            }
+    printf("List of high score gamers:\n");
+    for(i=0;i<size&&i<10;i++)//print
+        printf("%d-%s\t%f\n",i+1,p[i].name,p[i].scoreSum);
+    free(p);
+    fclose(personHolder);
 }
 int main()
 {
@@ -261,10 +293,14 @@ int main()
     printf("Please enter your name:");
     char name[max_n];
     gets(name);
+    int cnt;
+    for(cnt=0;cnt<max_n;cnt++)
+        if(name[cnt]=='\n'||name[cnt]=='\r')
+            name[cnt]='\0';
     FILE *personHolder=fopen("Persons.bin","r+b");
     if(personHolder==NULL)
         return -1;
-   int currentSocore=0,check=0;//Check will be used to check availability of person in Persons.txt
+   int currentSocore=0,flag=0;//Check will be used to check availability of person in Persons.txt
 //    char tempname[max_n];
     struct person tmp,checkPerson;
     while(1)
@@ -273,27 +309,32 @@ int main()
             break;
         if(strcmp(checkPerson.name,name)==0)
         {
-            check++;
+            flag=1;
             break;
         }
     }
-    if(check==0)
+    if(flag==0)
     {
         int i=0;
-        for(i=0;i<15;i++)
+        for(i=0;i<=strlen(name);i++)
+            tmp.name[i]=name[i];
+        for(i=0;i<max_number_of_topics;i++)
             tmp.score[i]=0;
+        tmp.scoreSum=0;
        // fwrite(&tmp,sizeof(struct person),1,personHolder);//This line added to exit function
     }
     else
     {
         tmp=checkPerson;
     }
+//    printf("%s\n\n%d\n",tmp.name,flag);   //Test struct and flag
     fflush(stdin);
+    fclose(personHolder);
     while(1)
     {
     printf("What Do you want to do next?(remember you can exit any time by entering Q)\n");
     printf("a-Start a new game\nb-Show high score\n");
-    if(check)
+    if(flag)
         printf("c-resume game\n");
     char choose;
     scanf("%c",&choose);
@@ -301,23 +342,32 @@ int main()
     switch (choose)
         {
             int c,scoreindex;
+            char endFlag;
+            float s;
             case('a'):
                 printf("Which one do you want?\n1-Choose one from available topics!\n2-Make a new topic!\n");
                 scanf("%d",&c);
                 fflush(stdin);
                 if(c==1){
-                    if((scoreindex=topic_select())==-1);
+                    if((scoreindex=topic_select())==-1)
                         EXIT(tmp);
-                    tmp.score[scoreindex]+=rand_select();
-                    printf("Your score in this topics is %f\nYou can Exit by entering Q",tmp.score[scoreindex]);
+                    if((s=rand_select())>=tmp.score[scoreindex])
+                        tmp.score[scoreindex]=s;
+                    tmp.scoreSum+=s;
+                    printf("Your score in this topics is %f and you high score in this topic is%f\nDo you want to continue?!\na-Yes!!!\nb-no\n",s,tmp.score[scoreindex]);
+                    scanf("%c",&endFlag);
+                    if(endFlag=='b')
+                        EXIT(tmp);
+                    fflush(stdin);
                 }
                 else
                     if(topic_generator()==-1)
                         EXIT(tmp);
+
                 //Game logic wont function will be added here
                 break;
             case('b'):
-
+                highScoreShow();
             //Show high score here
             break;
             case('c'):
@@ -325,10 +375,10 @@ int main()
                 scanf("%d",&c);
                 fflush(stdin);
                 if(c==1){
-                    if((scoreindex=topic_select())==-1);
+                    if((scoreindex=topic_select())==-1)
                         EXIT(tmp);
                     tmp.score[scoreindex]+=rand_select();
-                    printf("Your score int this topics is %f\nYou can Exit by entering Q",tmp.score[scoreindex]);
+                    printf("Your score int this topics is %f\n\t*****You can Exit by entering Q\n",tmp.score[scoreindex]);
                 }
                 else
                     topic_generator();
@@ -339,7 +389,6 @@ int main()
                 break;
         }
     }
-    fclose(personHolder);
     EXIT(tmp);//Exit function is here:))
     return 0;
 }
