@@ -51,7 +51,7 @@ int topic_select()
     for(j=8;j<100;j++)
         if(topic[j]=='\n'||topic[j]=='\r')
             topic[j]='\0';
-    return ((int)num)-7;
+    return ((int)num)-97;
 }
 //This function creates a new topic and fill it with user's chosen names
 int topic_generator()
