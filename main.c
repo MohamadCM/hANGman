@@ -48,10 +48,10 @@ int topic_select()
         if(topic[j]=='\n')
             topic[j]='\0';
     fclose(input);
-    for(j=0;j<50;j++)
+    for(j=8;j<100;j++)
         if(topic[j]=='\n'||topic[j]=='\r')
             topic[j]='\0';
-    return 97-((int)num);
+    return ((int)num)-7;
 }
 //This function creates a new topic and fill it with user's chosen names
 int topic_generator()
@@ -199,7 +199,7 @@ float rand_select()
     double cpu_time_used;
 
     start = clock();
-    printf("%s\n\n\n\n",word);
+   // printf("%s\n\n\n\n",word);
     while(size!=0)
     {
         tmp=0;
@@ -231,6 +231,8 @@ float rand_select()
 //        printList(list);
         size--;
         current=list;
+        printf("\nRemaining word in this topic:%d\n",size);
+        Sleep(2000);
     }
     //time_t t2=time(NULL);
     //return ((float)score)/((int)((t2-t1)%60)+1);
