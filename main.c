@@ -123,14 +123,24 @@ int game_logic(char word[max_n])
         printf("%c ",guess_word[i]);
     char alp[26]={'\0'};
     i=0;
-    int cnt=0,j=0,k=0;
+    int cnt=0,j=0,k=0,flag=0;
     while(j<5)
     {
+        fflush(stdin);
+        flag=0;
         printf("\n");
         scanf("%c",&alp[cnt]);
-        fflush(stdin);
+        for(i=0;i<cnt;i++)
+            if(alp[i]==alp[cnt])
+                flag++;
         if(alp[cnt]=='Q')
             return -1;
+        if(alp[cnt]<97||alp[cnt]>122||flag!=0)
+        {
+            printf("Unavailable Character,Try again\n");
+            //Sleep(1500);
+            continue;
+        }
         for(i=0;i<strlen(word);i++)
             for(k=0;k<26;k++)
                 if(word[i]==alp[k])
@@ -139,7 +149,7 @@ int game_logic(char word[max_n])
         drown(j);
         printf("\n");
         if(j==4)
-                printf("Be carefull!This your last choice!\n");
+                printf("Be careful!This your last choice!\n");
         if(check_word(word,alp[cnt])==-1)
         {
             j++;
@@ -158,8 +168,8 @@ int game_logic(char word[max_n])
     }
     if(j==5)
     {
-        printf("You lost this one,the word was ***%s*** , next word (if available) will be loaded soon\n",word);
-        Sleep(2000);
+        printf("You lost this one,the word was ***%s***\n",word);
+        //Sleep(2000);
         return 0;
     }
     else
@@ -191,7 +201,7 @@ float rand_select()
     int random;
     srand(time(NULL));
     current=list;
- //   printList(current);
+ //   printList(current); Test the linkedlist of words
     int i,tmp=0,score=0;
     fclose(input);
     //time_t t1=time(NULL);
@@ -199,7 +209,7 @@ float rand_select()
     double cpu_time_used;
 
     start = clock();
-   // printf("%s\n\n\n\n",word);
+   // printf("%s\n\n\n\n",word); Test last input words from file
     while(size!=0)
     {
         tmp=0;
@@ -231,8 +241,11 @@ float rand_select()
 //        printList(list);
         size--;
         current=list;
-        printf("\nRemaining word in this topic:%d\n",size);
-        Sleep(2000);
+        if(size)
+            printf("\nnext word will be loaded soon\nRemaining word in this topic:%d\n",size);
+        else
+            printf("\nNo Word Left in this topics\n");
+        Sleep(2500);
     }
     //time_t t2=time(NULL);
     //return ((float)score)/((int)((t2-t1)%60)+1);
@@ -367,15 +380,16 @@ int main()
                 printf("Which one do you want?\n1-Choose one from available topics!\n2-Make a new topic!\n");
                 scanf("%d",&c);
                 fflush(stdin);
-                if(c==1){
+                if(c!=2){
                     if((scoreindex=topic_select())==-1)
                         EXIT(tmp);
                     if((s=rand_select())>=tmp.score[scoreindex])
                         tmp.score[scoreindex]=s;
                     tmp.scoreSum+=s;
                     printf("Topic ended\n");
-                    printf("Your score in this topics is %f and you high score in this topic is%f\nDo you want to continue?!\na-Yes!!!\nb-no\n",s,tmp.score[scoreindex]);
+                    printf("Your score in this topics is %f and you high score in this topic is %f\nDo you want to continue?!\na-Yes!!!\nb-no\n",s,tmp.score[scoreindex]);
                     Sleep(2000);
+                    fflush(stdin);
                     scanf("%c",&endFlag);
                     if(endFlag=='b')
                         EXIT(tmp);
@@ -413,6 +427,10 @@ int main()
                 break;
             case('Q'):
                 EXIT(tmp);
+                break;
+            default:
+                printf("Wrong option, try again!\n");
+                Sleep(1000);
                 break;
         }
     }
