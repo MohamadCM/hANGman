@@ -210,25 +210,35 @@ float rand_select()
 
     start = clock();
    // printf("%s\n\n\n\n",word); Test last input words from file
-    while(size!=0)
+    while(size)
     {
+        current=list;
         tmp=0;
         printf("\n\n");
         random=(rand()%size)+1;
+//        printf("%d\n",random);
+//        Sleep(2000);
         if(random==1){
-            list=deleteFront(list);
             if((tmp=game_logic(list->data))==-1)
                 break;//Exit function wont be over here
             score+=tmp;
+            list=deleteFront(list);
         }
         else if(random==size){
-            deletEnd(list);
             while(current->next!=NULL)
                 current=current->next;
             if((tmp=game_logic(current->data))==-1)
                 break;//Exit function wont over here
                 score+=tmp;
+            deletEnd(list);
             }
+//        else if(random==2)
+//        {
+//            if((tmp=game_logic(current->next->data))==-1)
+//                break;//Exit function wont be over here
+//            score+=tmp;
+//            deleteNode(current);
+//        }
         else
         {
             for(i=1;i<random-1;i++)
@@ -264,6 +274,10 @@ void EXIT(struct person p)
         printf("Thank you for playing, We'll miss you!\n");
         exit(-1);
     }
+    int i;
+    p.scoreSum=0;
+    for(i=0;i<max_number_of_topics;i++)
+        p.scoreSum+=p.score[i];
     FILE *personHolder=fopen("Persons.bin","r+b");
     struct person tmp;
     while(1)
@@ -285,6 +299,7 @@ void EXIT(struct person p)
 }
 void highScoreShow()
 {
+    system("cls");
     FILE *personHolder=fopen("Persons.bin","rb");
     int i=1;
     struct person* p;
@@ -310,6 +325,7 @@ void highScoreShow()
     for(i=1;i<size&&i<10;i++)//print
         printf("%d-%8s\t%f\n",i,p[i].name,p[i].scoreSum);
     free(p);
+    Sleep(2000);
     fclose(personHolder);
 }
 int main()
@@ -373,10 +389,13 @@ int main()
     fflush(stdin);
     switch (choose)
         {
-            int c,scoreindex;
+            int c,scoreindex,i;
             char endFlag;
             float s;
             case('a'):
+                for(i=0;i<max_number_of_topics;i++)
+                tmp.score[i]=0;
+                tmp.scoreSum=0;
                 printf("Which one do you want?\n1-Choose one from available topics!\n2-Make a new topic!\n");
                 scanf("%d",&c);
                 fflush(stdin);
@@ -406,6 +425,12 @@ int main()
             //Show high score here
             break;
             case('c'):
+                if(!flag)
+                {
+                    printf("Wrong option, try again!\n");
+                    Sleep(1000);
+                    continue;
+                }
                 printf("Which one do you want?\n1-Choose one from available topics!\n2-Make a new topic\n");
                 scanf("%d",&c);
                 fflush(stdin);
