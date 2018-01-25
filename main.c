@@ -12,6 +12,7 @@
 #define max_number_of_topics 15
 //This string keeps the chosen Topics name and address
 char topic[100]="Topics\\";
+char flag_Q='\0';
 //This function will read the available topics.txt inside Topics folder print them and ask user to choose a topic then completes the topic address
 int topic_select()
 {
@@ -181,6 +182,7 @@ int game_logic(char word[max_n])
 }
 float rand_select()
 {
+    flag_Q='\0';
     FILE * input=fopen(topic,"r");
     struct node *list=NULL;
     int size=1;
@@ -229,7 +231,7 @@ float rand_select()
                 current=current->next;
             if((tmp=game_logic(current->data))==-1)
                 break;//Exit function wont over here
-                score+=tmp;
+            score+=tmp;
             deletEnd(list);
             }
 //        else if(random==2)
@@ -259,6 +261,8 @@ float rand_select()
     }
     //time_t t2=time(NULL);
     //return ((float)score)/((int)((t2-t1)%60)+1);
+    if(tmp==-1)
+        flag_Q='Q';
     end = clock();
     return ((double) score)/((int)(((double) (end - start)) / CLOCKS_PER_SEC)%10);
 
@@ -394,7 +398,7 @@ int main()
             float s;
             case('a'):
                 for(i=0;i<max_number_of_topics;i++)
-                tmp.score[i]=0;
+                    tmp.score[i]=0;
                 tmp.scoreSum=0;
                 printf("Which one do you want?\n1-Choose one from available topics!\n2-Make a new topic!\n");
                 scanf("%d",&c);
@@ -406,7 +410,11 @@ int main()
                         tmp.score[scoreindex]=s;
                     tmp.scoreSum+=s;
                     printf("Topic ended\n");
-                    printf("Your score in this topics is %f and you high score in this topic is %f\nDo you want to continue?!\na-Yes!!!\nb-no\n",s,tmp.score[scoreindex]);
+                    printf("Your score in this topics is %f and your high score in this topic is %f\n",s,tmp.score[scoreindex]);
+                    if(flag_Q=='Q')
+                        EXIT(tmp);
+                    if(flag_Q!='Q')
+                        printf("Do you want to continue?!\na-Yes!!!\nb-no\n");
                     Sleep(2000);
                     fflush(stdin);
                     scanf("%c",&endFlag);
@@ -440,7 +448,12 @@ int main()
                     if((s=rand_select())>=tmp.score[scoreindex])
                         tmp.score[scoreindex]=s;
                     tmp.scoreSum+=s;
-                    printf("Your score in this topics is %f and you high score in this topic is %f\nDo you want to continue?!\na-Yes!!!\nb-no\n",s,tmp.score[scoreindex]);
+                    printf("Topic ended!\n");
+                    printf("Your score in this topics is %f and your high score in this topic is %f\n",s,tmp.score[scoreindex]);
+                    if(flag_Q=='Q')
+                        EXIT(tmp);
+                    if(flag_Q!='Q')
+                        printf("Do you want to continue?!\na-Yes!!!\nb-no\n");
                     scanf("%c",&endFlag);
                     if(endFlag=='b')
                         EXIT(tmp);
